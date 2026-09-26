@@ -1,4 +1,4 @@
--- Outreach leads table (Vecktrix voice agent)
+-- Outreach leads table
 
 CREATE TABLE IF NOT EXISTS leads (
     id             UUID        DEFAULT gen_random_uuid() PRIMARY KEY,

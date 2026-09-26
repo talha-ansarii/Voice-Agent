@@ -1,4 +1,4 @@
-# Vecktrix AI — Outreach Voice Agent
+# Outreach Voice Agent
 
 Outbound/inbound AI phone calls using **LiveKit Agents (TypeScript)**, **Gemini**, **Sarvam** STT/TTS, **Vobiz SIP**, and **Postgres** (Supabase) via **Prisma**.
 
@@ -51,7 +51,7 @@ config.json         # Agent prompts and model settings
 
 ## Outreach flow
 
-The agent pitches **Vecktrix AI** (web apps, AI automations, POCs), collects **name, email, phone, requirements**, and calls **`save_lead`** to store in Postgres. View leads in the dashboard **Leads** page.
+The agent pitches your configured offering, collects **name, email, phone, requirements**, and calls **`save_lead`** to store in Postgres. View leads in the dashboard **Leads** page.
 
 ## Environment
 

@@ -4,6 +4,9 @@ import { prisma } from './prisma.js';
 
 export const DEFAULT_AGENT_NAME = 'Demo agent';
 
+/** Renamed on login for installs created before white-label defaults. */
+const LEGACY_AGENT_NAMES = new Set(['Vecktrix']);
+
 function asRecord(value: unknown): Record<string, unknown> {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     return value as Record<string, unknown>;
@@ -81,7 +84,7 @@ export async function upsertGoogleUser(input: {
         config: defaultConfig,
       },
     });
-  } else if (agent.name === 'Vecktrix') {
+  } else if (LEGACY_AGENT_NAMES.has(agent.name)) {
     agent = await prisma.agent.update({
       where: { id: agent.id },
       data: { name: DEFAULT_AGENT_NAME, config: defaultConfig },

@@ -2,7 +2,7 @@
 
 [← Documentation index](README.md)
 
-Get the Vecktrix AI voice agent running locally in under 15 minutes.
+Get the voice agent running locally in under 15 minutes.
 
 ## Prerequisites
 
