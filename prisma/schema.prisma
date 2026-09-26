@@ -1,0 +1,135 @@
+// Prisma schema — Postgres (Neon recommended)
+// DATABASE_URL = direct connection (host must NOT contain -pooler)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String   @unique
+  name      String?
+  image     String?
+  googleId  String   @unique @map("google_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  agents          Agent[]
+  callLogs        CallLog[]
+  leads           Lead[]
+  activeCalls     ActiveCall[]
+  callTranscripts CallTranscript[]
+
+  @@map("users")
+}
+
+model Agent {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String
+  config    Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  callLogs        CallLog[]
+  leads           Lead[]
+  activeCalls     ActiveCall[]
+  callTranscripts CallTranscript[]
+
+  @@index([userId], map: "idx_agents_user")
+  @@map("agents")
+}
+
+model CallLog {
+  id                BigInt    @id @default(autoincrement())
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  phoneNumber       String?   @map("phone_number")
+  durationSeconds   Int?      @map("duration_seconds")
+  transcript        String?   @db.Text
+  summary           String?   @db.Text
+  recordingUrl      String?   @map("recording_url")
+  callerName        String?   @map("caller_name")
+  sentiment         String?
+  estimatedCostUsd  Decimal?  @map("estimated_cost_usd") @db.Decimal(10, 5)
+  callDate          DateTime? @map("call_date") @db.Date
+  callHour          Int?      @map("call_hour")
+  callDayOfWeek     String?   @map("call_day_of_week")
+  wasBooked         Boolean?  @default(false) @map("was_booked")
+  interruptCount    Int?      @default(0) @map("interrupt_count")
+  audioCodec        String?   @map("audio_codec")
+  callType          String?   @default("unknown") @map("call_type")
+  userId            String?   @map("user_id") @db.Uuid
+  agentId           String?   @map("agent_id") @db.Uuid
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent Agent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([userId, agentId], map: "idx_call_logs_tenant")
+  @@map("call_logs")
+}
+
+model CallTranscript {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  callRoomId String   @map("call_room_id")
+  phone      String?
+  role       String?
+  content    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  userId     String?  @map("user_id") @db.Uuid
+  agentId    String?  @map("agent_id") @db.Uuid
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent Agent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([callRoomId], map: "idx_call_transcripts_room")
+  @@index([phone], map: "idx_call_transcripts_phone")
+  @@index([userId, agentId], map: "idx_call_transcripts_tenant")
+  @@map("call_transcripts")
+}
+
+model ActiveCall {
+  roomId      String   @id @map("room_id")
+  phone       String?
+  callerName  String?  @map("caller_name")
+  status      String?  @default("ringing")
+  callType    String?  @map("call_type")
+  startedAt   DateTime @default(now()) @map("started_at") @db.Timestamptz(6)
+  lastUpdated DateTime @default(now()) @map("last_updated") @db.Timestamptz(6)
+  userId      String?  @map("user_id") @db.Uuid
+  agentId     String?  @map("agent_id") @db.Uuid
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent Agent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([userId, agentId], map: "idx_active_calls_tenant")
+  @@map("active_calls")
+}
+
+model Lead {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  name           String?
+  email          String?
+  phone          String?
+  requirements   String?  @db.Text
+  interestLevel  String?  @default("medium") @map("interest_level")
+  source         String?  @default("outbound_call")
+  callRoomId     String?  @map("call_room_id")
+  status         String?  @default("new")
+  userId         String?  @map("user_id") @db.Uuid
+  agentId        String?  @map("agent_id") @db.Uuid
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent Agent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt(sort: Desc)], map: "idx_leads_created_at")
+  @@index([phone], map: "idx_leads_phone")
+  @@index([status], map: "idx_leads_status")
+  @@index([userId, agentId], map: "idx_leads_tenant")
+  @@map("leads")
+}

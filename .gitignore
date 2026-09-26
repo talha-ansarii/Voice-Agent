@@ -1,0 +1,48 @@
+# Node / TypeScript
+node_modules/
+dist/
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+
+# Environment variables
+.env
+.env.local
+frontend/.env.local
+deploy/.env
+
+# Google service account credentials
+google_creds.json
+*.json.bak
+KMS/
+
+# Python (removed — legacy)
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE settings
+.vscode/
+.idea/
+
+# Logs
+*.log
+ui_server.log
+
+# Sensitive config — never commit real credentials
+# config.json is tracked but must NOT contain real API keys
+# Use .env or environment variables for secrets in production
+
+# Google service account credentials
+google_creds.json
+*.json.bak
+
+# macOS
+.DS_Store
+
+# Per-client configs (secrets). Keep the empty dir for Docker COPY.
+configs/*
+!configs/.gitkeep

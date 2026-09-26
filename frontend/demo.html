@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Voice Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0f1117;color:#e2e8f0;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:24px;padding:24px}
+    .card{background:#1c2333;border:1px solid #2a3448;border-radius:20px;padding:40px;max-width:440px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.4)}
+    h1{font-size:22px;font-weight:700;margin-bottom:6px}
+    .sub{color:#8892a4;font-size:13px;margin-bottom:28px}
+    .avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 24px}
+    .btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s}
+    .btn-start{background:#6c63ff;color:#fff}
+    .btn-start:hover{background:#5a52e0;box-shadow:0 0 24px rgba(108,99,255,0.4)}
+    .btn-end{background:#ef4444;color:#fff;display:none}
+    .btn-end:hover{background:#dc2626}
+    #status{font-size:13px;color:#8892a4;margin-top:16px;min-height:20px}
+    .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:6px;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 4px #22c55e}50%{box-shadow:0 0 12px #22c55e}}
+    .vol-bar{display:flex;gap:3px;align-items:flex-end;justify-content:center;height:32px;margin-top:12px;display:none}
+    .vol-bar span{width:4px;background:#6c63ff;border-radius:2px;transition:height 0.1s}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="avatar">🎙</div>
+    <h1>Talk to Aryan</h1>
+    <div class="sub">AI-powered multilingual consultant</div>
+    <button class="btn btn-start" id="startBtn" onclick="startCall()">📞 Start Demo Call</button>
+    <button class="btn btn-end" id="endBtn" onclick="endCall()">📵 End Call</button>
+    <div id="status">Click to start a live voice demo</div>
+    <div class="vol-bar" id="volBar">
+      <span id="b1" style="height:8px"></span><span id="b2" style="height:14px"></span>
+      <span id="b3" style="height:20px"></span><span id="b4" style="height:14px"></span>
+      <span id="b5" style="height:8px"></span>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+  <script>
+    let room;
+    async function startCall() {
+      document.getElementById('status').textContent = 'Connecting...';
+      document.getElementById('startBtn').disabled = true;
+      try {
+        const res = await fetch('/api/demo-token').then(r => r.json());
+        if (res.error) throw new Error(res.error);
+        room = new LivekitClient.Room();
+        await room.connect(res.url, res.token, {autoSubscribe: true});
+        await room.localParticipant.setMicrophoneEnabled(true);
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('endBtn').style.display = 'block';
+        document.getElementById('volBar').style.display = 'flex';
+        setStatus('<span class="pulse"></span>Connected — speak now!');
+        animateBars();
+      } catch(e) {
+        setStatus('❌ ' + e.message);
+        document.getElementById('startBtn').disabled = false;
+      }
+    }
+    async function endCall() {
+      if (room) { await room.disconnect(); room = null; }
+      document.getElementById('startBtn').style.display = 'block';
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('endBtn').style.display = 'none';
+      document.getElementById('volBar').style.display = 'none';
+      setStatus('Call ended. Click to start again.');
+    }
+    function setStatus(html) { document.getElementById('status').innerHTML = html; }
+    function animateBars() {
+      if (!room) return;
+      ['b1','b2','b3','b4','b5'].forEach(id => {
+        document.getElementById(id).style.height = (4 + Math.random()*24) + 'px';
+      });
+      setTimeout(animateBars, 150);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "name": "voice-agent",
+  "version": "2.0.0",
+  "description": "Outreach voice agent — TypeScript, LiveKit Agents, Prisma",
+  "type": "module",
+  "scripts": {
+    "agent:dev": "tsx src/agent/index.ts dev",
+    "agent:start": "node dist/agent/index.js start",
+    "server:dev": "tsx src/server/index.ts",
+    "server:start": "node dist/server/index.js",
+    "dashboard": "npm run dev --prefix frontend",
+    "call": "tsx scripts/make-call.ts",
+    "eval:calls": "tsx scripts/eval-calls.ts",
+    "setup:trunk": "tsx scripts/setup-trunk.ts",
+    "build": "tsc",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@livekit/agents": "^1.4.4",
+    "@livekit/agents-plugin-deepgram": "^1.4.4",
+    "@livekit/agents-plugin-deepgram": "1.4.4",
+    "@livekit/agents-plugin-google": "^1.4.4",
+    "@livekit/agents-plugin-openai": "^1.4.4",
+    "@livekit/agents-plugin-sarvam": "^1.4.4",
+    "@livekit/noise-cancellation-node": "^0.1.9",
+    "@prisma/client": "^6.8.2",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "livekit-client": "^2.15.4",
+    "livekit-server-sdk": "^2.13.0",
+    "prisma": "^6.8.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.21",
+    "prisma": "^6.8.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

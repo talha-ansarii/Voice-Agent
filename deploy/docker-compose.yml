@@ -1,0 +1,16 @@
+services:
+  app:
+    image: ${VOICE_AGENT_IMAGE:-ghcr.io/talha-ansarii/voice-agent:latest}
+    container_name: voice-agent
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
+    environment:
+      PORT: "8000"
+      HOSTNAME: "0.0.0.0"
+      EXPRESS_INTERNAL_URL: http://127.0.0.1:8000
+      UI_METRICS_URL: http://127.0.0.1:8000/internal/record-call
+      AUTH_TRUST_HOST: "true"
+      NEXT_PUBLIC_API_URL: ""
